@@ -84,36 +84,38 @@ var rulebook = new Dictionary();
 rulebook.Add('X','F[−X][X]F[−X]+FX');
 rulebook.Add('F', 'FF');
 
-let currentRule: string;
+
 
 class LSystem {
   controls: any;
-
+  currentRule: string;
   constructor(seed: string) {
-      currentRule = seed;
+      this.currentRule = seed;
   }
+  
   
 
 expandRule(seed:string): string {
     var curr  = "";
     for (var i = 0; i < seed.length; i++) {
         if(rulebook.ContainsKey(seed.charAt(i).toString())){
-            curr.concat(rulebook.Item(seed.charAt(i).toString()));
+            //console.log("Contains Key + " + seed.charAt(i).toString());
+            curr = curr + rulebook.Item(seed.charAt(i).toString());
         }
-      }
+    }
     
     return curr;
 }
 
  expand(iter: number): string{
     for(var i = 0; i < iter; i++){
-        currentRule = this.expandRule(currentRule);
+        this.currentRule = this.expandRule(this.currentRule);
     }
-    return currentRule;
+    return this.currentRule;
  }
 
  draw(){
-    var dR = new DrawableRule(currentRule);
+    var dR = new DrawableRule(this.currentRule);
     dR.draw();
  }
  

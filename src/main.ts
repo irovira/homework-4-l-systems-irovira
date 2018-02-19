@@ -24,8 +24,8 @@ let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
 
-var test = new LSystem('X');
-var s = test.expand(1);
+
+
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -36,7 +36,9 @@ function loadScene() {
 
   cube = new Cube(vec3.fromValues(0, 0, 0));
   cube.create();
-  console.log("Axiom is " + s);
+  // var test = new LSystem('X');
+  // var s = test.expand(2);
+  // console.log(test.currentRule);
 }
 
 function main() {
