@@ -9,6 +9,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import LSystem from './LSystem';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -23,6 +24,8 @@ let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
 
+var test = new LSystem('X');
+var s = test.expand(1);
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -33,7 +36,7 @@ function loadScene() {
 
   cube = new Cube(vec3.fromValues(0, 0, 0));
   cube.create();
-  
+  console.log("Axiom is " + s);
 }
 
 function main() {
@@ -91,7 +94,6 @@ function main() {
     currColor = vec4.fromValues(controls.color[0] / 255.0, controls.color[1] / 255.0, controls.color[2] / 255.0, controls.color[3]);
     lambert.setGeometryColor(currColor);
     renderer.render(camera, lambert, [
-      icosphere,
       //square,
       cube,
     ]);
