@@ -7,6 +7,8 @@ abstract class Drawable {
   bufPos: WebGLBuffer;
   bufNor: WebGLBuffer;
 
+  isMesh:boolean = false;
+
   idxBound: boolean = false;
   posBound: boolean = false;
   norBound: boolean = false;

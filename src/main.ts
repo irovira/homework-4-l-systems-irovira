@@ -5,12 +5,17 @@ import * as DAT from 'dat-gui';
 import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
+import MeshDrawable from './geometry/MeshDrawable';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import LSystem from './LSystem';
+//import * as OBJ from 'webgl-obj-loader';
+import * as fs from 'fs';
 
+
+var OBJ = require('webgl-obj-loader');
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -18,24 +23,22 @@ const controls = {
   'Load Scene': loadScene, // A function pointer, essentially
   //'test' : test, 
   color: [255.0,0.0,0.0,1.0],
-};
+}; 
 
 let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
+let meshOBJ: any;
+let mesh: MeshDrawable;
+//let mesh: OBJ.Mesh;
 
 
 
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
-  icosphere.create();
+  mesh = new MeshDrawable(vec3.fromValues(0,0,0));
+  mesh.createMesh('my_cube.obj');
 
-  square = new Square(vec3.fromValues(0, 0, 0));
-  square.create();
-
-  cube = new Cube(vec3.fromValues(0, 0, 0));
-  cube.create();
   // var test = new LSystem('X');
   // var s = test.expand(2);
   // console.log(test.currentRule);
@@ -63,6 +66,7 @@ function main() {
   if (!gl) {
     alert('WebGL 2 not supported!');
   }
+
   // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
@@ -81,10 +85,6 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
-  // const rainbow = new ShaderProgram([
-  //   new Shader(gl.VERTEX_SHADER, require('./shaders/rainbow-vert.glsl')),
-  //   new Shader(gl.FRAGMENT_SHADER, require('./shaders/rainbow-frag.glsl')),
-  // ]);
 
   let currColor: vec4;
   // This function will be called every frame
@@ -96,14 +96,10 @@ function main() {
     currColor = vec4.fromValues(controls.color[0] / 255.0, controls.color[1] / 255.0, controls.color[2] / 255.0, controls.color[3]);
     lambert.setGeometryColor(currColor);
     renderer.render(camera, lambert, [
-      //square,
-      cube,
+      mesh,
+      //cube,
     ]);
-    // renderer.render(camera, rainbow, [
-    //   icosphere,
-    //   //square,
-    //   cube,
-    // ]);
+
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

@@ -3,14 +3,6 @@ import {vec3, mat4} from 'gl-matrix';
 import Turtle from './Turtle';
 
 
-// const newLocal = {
-//   "X": function () { return 2;},
-//   "F": function () { },
-//   "[": function () { },
-//   "]": function () { },
-//   "-": function () { },
-//   "+": function () { },
-// };
 //Fractal Plant rules referenced from: https://en.wikipedia.org/wiki/L-system
 //(X → F[−X][X]F[−X]+FX), (F → FF)
 //var fnMap = newLocal

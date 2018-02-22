@@ -93,17 +93,18 @@ class ShaderProgram {
 
     if (this.attrPos != -1 && d.bindPos()) {
       gl.enableVertexAttribArray(this.attrPos);
-      gl.vertexAttribPointer(this.attrPos, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.attrPos, 3, gl.FLOAT, false, 0, 0);
     }
 
     if (this.attrNor != -1 && d.bindNor()) {
       gl.enableVertexAttribArray(this.attrNor);
-      gl.vertexAttribPointer(this.attrNor, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(this.attrNor, 3, gl.FLOAT, false, 0, 0); //changed from 4 to 3 for new obj indices *sobs gently*
     }
 
     d.bindIdx();
-    gl.drawElements(d.drawMode(), d.elemCount(), gl.UNSIGNED_INT, 0);
-
+    //gl.drawElements(d.drawMode(), d.elemCount(), gl.UNSIGNED_INT, 0);
+    
+    gl.drawElements(d.drawMode(), d.elemCount(), gl.UNSIGNED_SHORT, 0); //changed to unsigned_short based on the webgl-obj-loader initBuffer docs
     if (this.attrPos != -1) gl.disableVertexAttribArray(this.attrPos);
     if (this.attrNor != -1) gl.disableVertexAttribArray(this.attrNor);
   }
