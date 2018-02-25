@@ -1,5 +1,5 @@
 
-import {vec3, vec4, mat4} from 'gl-matrix';
+import {vec3, vec4, mat4,quat} from 'gl-matrix';
 //Fractal Plant rules referenced from: https://en.wikipedia.org/wiki/L-system
 //(X → F[−X][X]F[−X]+FX), (F → FF)
 class Stack{
@@ -41,6 +41,7 @@ class Turtle {
     this.basePositions = pos;
     this.baseNormals = normals;
     this.baseIndices = indices;
+    this.turtleStack = new Stack();
     console.log('inside turtle indices are ' + indices.length);
 
     this.positions = new Array<number>();
@@ -65,8 +66,53 @@ class Turtle {
 
   }
 
-  rotate(rot:mat4){
+  rotate(rot:quat){
     //mat4.multiply(this.rotation, this.rotation,rot);
+    var translation = vec3.create();
+    vec3.set (translation, 0,1, 0);
+    console.log(translation);
+    var m = mat4.create();
+    mat4.fromRotationTranslation(m, rot, translation) 
+    //mat4.translate (m, m, translation);
+    //mat4.multiply(m, m,rot);
+    console.log(m);
+    //var m = mat4.fromTranslation(m, vec3.fromValues(0,1,0));
+    // for(var i = 0; i < this.instructions.length; i++){
+    //   this.fnMap[this.instructions.charAt(i).toString()];
+    // }
+    for(var i = 0;i < this.size;i = i + 4){
+      //positions
+      var pos = vec4.fromValues(this.basePositions[i], this.basePositions[i+1], this.basePositions[i+2], this.basePositions[i+3]);
+      pos = vec4.transformMat4(pos,pos,m);
+      this.basePositions[i] = pos[0];
+      console.log(this.basePositions[i]);
+      this.basePositions[i+1] = pos[1];
+      this.basePositions[i+2] = pos[2];
+      this.basePositions[i+3] = pos[3];
+      this.positions = this.positions.concat(pos[0], pos[1], pos[2],pos[3]);
+
+      // //normals
+      var nor = vec4.fromValues(this.baseNormals[i], this.baseNormals[i+1], this.baseNormals[i+2], this.baseNormals[i+3]);
+      nor = vec4.transformMat4(nor, nor,m);
+      this.baseNormals[i] = nor[0];
+      this.baseNormals[i+1] = nor[1];
+      this.baseNormals[i+2] = nor[2];
+      this.baseNormals[i+3] = nor[3];
+      this.normals = this.normals.concat(nor[0], nor[1], nor[2],nor[3]);
+    }
+
+    var offset = Math.floor(this.positions.length / 4.0);
+    console.log('indices buffer is ' + this.indices.length);
+    for(var j = 0;j < this.index; j++){
+      // //indices
+      
+      this.baseIndices[j] = this.baseIndices[j] + offset;
+      this.indices.push(this.baseIndices[j]);
+
+    }
+    // console.log('positions buffer is ' + this.positions);
+    // console.log('normals buffer is ' + this.normals);
+    console.log('indices buffer is ' + this.indices);
   }
 
   move(dir:vec3){
@@ -118,13 +164,16 @@ class Turtle {
   }
 
   push(){
-    this.turtleStack.push(this);
+    this.turtleStack.push(new Turtle(this.basePositions, this.baseNormals, this.baseIndices));
   }
 
   pop(){
     var p = this.turtleStack.pop();
-    this.positions = p.positions;
-    this.normals = p.normals;
+    //this.baseIndices = p.baseIndices;
+    this.basePositions = p.basePositions;
+    //this.baseNormals = p.baseNormals;
+    // this.positions = p.positions;
+    // this.normals = p.normals;
   }
 
   draw(){

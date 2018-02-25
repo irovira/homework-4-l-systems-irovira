@@ -1,5 +1,5 @@
 import * as CameraControls from '3d-view-controls';
-import {vec3, mat4} from 'gl-matrix';
+import {vec3, mat4, quat} from 'gl-matrix';
 import Turtle from './Turtle';
 import MeshDrawable from './geometry/MeshDrawable';
 
@@ -37,7 +37,7 @@ class DrawableRule {
 
   X(){
     var r = 2;
-    this.turtle.move(vec3.fromValues(1,0,0));
+    this.turtle.move(vec3.fromValues(1.5,0,0));
     
   }
   F(){
@@ -52,14 +52,16 @@ class DrawableRule {
     this.turtle.pop();
   }
   rotateLeft(){
-    var rot = mat4.create();
-
-    mat4.rotateY(rot, rot, 25 * degree);
+    console.log('rotate left called');
+    var rot = quat.create();
+    quat.rotateZ(rot,rot,25*degree);
     this.turtle.rotate(rot);
+    //this.turtle.rotate(rot);
   }
   rotateRight(){
-    var rot = mat4.create();
-    mat4.rotateY(rot, rot, -25 * degree);
+    console.log('rotate right called');
+    var rot = quat.create();
+    quat.rotateZ(rot,rot,-25*degree);
     this.turtle.rotate(rot);
   }
 
@@ -79,22 +81,35 @@ class DrawableRule {
 
   draw(){
     //this.X();
-    // for(var i = 0; i < this.instructions.length; i++){
+    console.log(this.instructions);
+    for(var i = 0; i < this.instructions.length; i++){
+      var rule = this.instructions.charAt(i).toString();
+      if( rule == 'F'){
+        this.F();
+      } else if ( rule == 'X'){
+        this.X();
+      } else if ( rule == '+'){
+        this.rotateRight();
+      } else if (rule == '-'){
+        this.rotateLeft();
+      } else if (rule == '['){
+        this.push();
+      } else if (rule == ']'){
+        this.pop();
+      }
+      this.mesh.appendInd(this.getInd());
+      this.mesh.appendPos(this.getPos());
+      this.mesh.appendNor(this.getNor());
 
-    //   this.fnMap[this.instructions.charAt(i).toString()];
-    //   this.mesh.appendInd(this.getInd());
-    //   this.mesh.appendPos(this.getPos());
-    //   this.mesh.appendNor(this.getNor());
-
-    // }
-    this.F();
-    this.mesh.appendInd(this.getInd());
-    this.mesh.appendPos(this.getPos());
-    this.mesh.appendNor(this.getNor());
-    this.X();
-    this.mesh.appendInd(this.getInd());
-    this.mesh.appendPos(this.getPos());
-    this.mesh.appendNor(this.getNor());
+    }
+    // this.F();
+    // this.mesh.appendInd(this.getInd());
+    // this.mesh.appendPos(this.getPos());
+    // this.mesh.appendNor(this.getNor());
+    // this.X();
+    // this.mesh.appendInd(this.getInd());
+    // this.mesh.appendPos(this.getPos());
+    // this.mesh.appendNor(this.getNor());
     //this.F();
   }
 

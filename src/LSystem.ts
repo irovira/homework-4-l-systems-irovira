@@ -102,9 +102,11 @@ class LSystem {
 
 expandRule(seed:string): string {
     var curr  = "";
+    console.log('seed is ' + seed);
     for (var i = 0; i < seed.length; i++) {
+        console.log(rulebook.ContainsKey(seed.charAt(i).toString()));
         if(rulebook.ContainsKey(seed.charAt(i).toString())){
-            //console.log("Contains Key + " + seed.charAt(i).toString());
+            console.log("Contains Key + " + seed.charAt(i).toString());
             curr = curr + rulebook.Item(seed.charAt(i).toString());
         }
     }
@@ -113,6 +115,7 @@ expandRule(seed:string): string {
 }
 
  expand(iter: number): string{
+     console.log('expand called');
     for(var i = 0; i < iter; i++){
         this.currentRule = this.expandRule(this.currentRule);
     }
