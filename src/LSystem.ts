@@ -91,9 +91,6 @@ class LSystem {
   controls: any;
   currentRule: string;
   mesh: MeshDrawable;
-  baseIndices: Uint16Array;
-  basePositions: Float32Array;
-  baseNormals: Float32Array;
   center: vec4;
   //turtle: Turtle;
   constructor(seed: string, mesh: MeshDrawable) {
@@ -124,28 +121,18 @@ expandRule(seed:string): string {
 
  draw(){
     var dR = new DrawableRule(this.currentRule, this.mesh);
-    // this.mesh.appendInd(dR.getInd());
-    // this.mesh.appendPos(dR.getPos());
-    // this.mesh.appendNor(dR.getNor());
-    dR.draw();
-    // this.mesh.appendInd(dR.getInd());
-    // this.mesh.appendPos(dR.getPos());
-    // this.mesh.appendNor(dR.getNor());
-
-    //dR.draw();
-    //dR.draw();
-
-    //dR.draw();
     this.mesh.appendInd(dR.getInd());
     this.mesh.appendPos(dR.getPos());
     this.mesh.appendNor(dR.getNor());
-    // this.mesh.appendInd(dR.getInd());
-    // this.mesh.appendPos(dR.getPos());
-    // this.mesh.appendNor(dR.getNor());
+    dR.draw();
+    
+    
     // dR.draw();
+
     // this.mesh.appendInd(dR.getInd());
     // this.mesh.appendPos(dR.getPos());
     // this.mesh.appendNor(dR.getNor());
+
     this.mesh.createMesh();
  }
  

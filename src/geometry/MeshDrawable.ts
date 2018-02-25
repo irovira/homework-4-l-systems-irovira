@@ -48,9 +48,9 @@ class MeshDrawable extends Drawable {
       this.currPositions[newPosInd+3] = 1.0;
       newPosInd = newPosInd + 4;
     }
-    this.positions = new Float32Array(this.currPositions);
+    //this.positions = new Float32Array(this.currPositions);
     console.log(currentMesh.vertices);
-    console.log(this.positions);
+    //console.log(this.currPositions);
 
 
      //append 0
@@ -63,11 +63,12 @@ class MeshDrawable extends Drawable {
       this.currNormals[newNorInd+3] = 0.0;
       newNorInd = newNorInd + 4;
     }
-    this.normals = new Float32Array(this.currNormals);
-    //this.currIndices = currentMesh.indices;
-    this.indices = new Uint32Array(currentMesh.indices);
+    //this.normals = new Float32Array(this.currNormals);
     
-    console.log(this.currIndices.length);
+    this.currIndices = currentMesh.indices;
+    //this.indices = new Uint32Array(currentMesh.indices);
+    
+    console.log(currentMesh.indices.length);
     //console.log(mesh.normalBuffer.numItems);
   }
 
@@ -80,9 +81,9 @@ class MeshDrawable extends Drawable {
     // OBJ.initMeshBuffers(gl, mesh);
     // console.log(mesh.normalBuffer.numItems);
 
-    // this.positions = new Float32Array(this.currPositions);
-    // this.normals = new Float32Array(this.currNormals);
-    // this.indices = new Uint16Array(this.currIndices);
+    this.positions = new Float32Array(this.currPositions);
+    this.normals = new Float32Array(this.currNormals);
+    this.indices = new Uint32Array(this.currIndices);
     // this.positions = new Float32Array(new Array<number>());
     // this.normals = new Float32Array(new Array<number>());
     // this.indices = new Uint16Array(new Array<number>());
@@ -137,8 +138,9 @@ class MeshDrawable extends Drawable {
   }
 
   appendInd(ind:Array<number>){
+    console.log('the currentindex buffer size is ' + this.currIndices.length);
+    console.log('the incoming array is ' + ind.length);
     this.currIndices = this.currIndices.concat(ind);
-    console.log('' + this.currIndices[107]);
     console.log('the currentindex buffer size is ' + this.currIndices.length);
   }
 

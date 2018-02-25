@@ -12,7 +12,7 @@ class DrawableRule {
   controls: any;
   instructions: string;
   fnMap: any;
-  baseIndices: Uint16Array;
+  baseIndices: Uint32Array;
   basePositions: Float32Array;
   baseNormals: Float32Array;
   turtle: Turtle;
@@ -28,21 +28,22 @@ class DrawableRule {
     this.fnMap["+"] = this.rotateRight; //rotate right 25 degrees
     this.mesh = mesh;
     
-    this.basePositions = new Float32Array(mesh.positions);
-    //console.log(mesh.currPositions[0]);
-    this.baseNormals = new Float32Array(mesh.normals);
-    this.baseIndices = new Uint16Array(mesh.indices);
+    this.basePositions = new Float32Array(mesh.currPositions);
+    this.baseNormals = new Float32Array(mesh.currNormals);
+    this.baseIndices = new Uint32Array(mesh.currIndices);
     //console.log(this.baseIndices.toString());
-    this.turtle = new Turtle(this.basePositions, this.baseNormals, this.baseIndices);
+    this.turtle = new Turtle(mesh.currPositions, mesh.currNormals, mesh.currIndices);
   }
 
   X(){
     var r = 2;
+    this.turtle.move(vec3.fromValues(1,0,0));
     
   }
   F(){
     console.log('f is called lol');
-    this.turtle.move(vec3.fromValues(1,1,0));
+    this.turtle.move(vec3.fromValues(0,2,0));
+    
   }
   push(){
     this.turtle.push();
@@ -79,9 +80,21 @@ class DrawableRule {
   draw(){
     //this.X();
     // for(var i = 0; i < this.instructions.length; i++){
+
     //   this.fnMap[this.instructions.charAt(i).toString()];
+    //   this.mesh.appendInd(this.getInd());
+    //   this.mesh.appendPos(this.getPos());
+    //   this.mesh.appendNor(this.getNor());
+
     // }
     this.F();
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
+    this.X();
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
     //this.F();
   }
 

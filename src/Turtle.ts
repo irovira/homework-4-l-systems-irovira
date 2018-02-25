@@ -24,9 +24,9 @@ class Stack{
 }
 class Turtle {
   controls: any;
-  baseIndices: Uint16Array;
-  basePositions: Float32Array;
-  baseNormals: Float32Array;
+  baseIndices: Array<number>;
+  basePositions: Array<number>;
+  baseNormals: Array<number>;
   positions: Array<number>;
   normals: Array<number>;
   indices: Array<number>;
@@ -37,10 +37,11 @@ class Turtle {
 
   turtleStack: Stack;
   
-  constructor(pos: Float32Array, normals:Float32Array, indices: Uint16Array) {
-    this.basePositions = new Float32Array(pos);
-    this.baseNormals = new Float32Array(normals);
-    this.baseIndices = new Uint16Array(indices);
+  constructor(pos: Array<number>, normals:Array<number>, indices: Array<number>) {
+    this.basePositions = pos;
+    this.baseNormals = normals;
+    this.baseIndices = indices;
+    console.log('inside turtle indices are ' + indices.length);
 
     this.positions = new Array<number>();
     this.normals = new Array<number>();
@@ -48,22 +49,20 @@ class Turtle {
     this.iter = 1;
     this.size = this.basePositions.length;
     this.index = this.baseIndices.length;
-    console.log('size is ' + this.size);
+    console.log('size is ' + this.index);
     
     
     
     //append base to positions array
-    var position =  Array.prototype.slice.call(this.basePositions);
-    this.positions = this.positions.concat(position);
+    // var position =  Array.prototype.slice.call(this.basePositions);
+    // this.positions = this.positions.concat(position);
     //norms
-    var nor =  Array.prototype.slice.call(this.baseNormals);
-    this.normals = this.normals.concat(nor);
+    // var nor =  Array.prototype.slice.call(this.baseNormals);
+    // this.normals = this.normals.concat(nor);
     //indices
-    var ind =  Array.prototype.slice.call(this.baseIndices);
-    this.indices =  this.indices.concat(ind);
+    // var ind =  Array.prototype.slice.call(this.baseIndices);
+    // this.indices =  this.indices.concat(ind);
 
-    console.log('positions buffer is ' + this.positions.length);
-    console.log('indices buffer is ' + this.indices.length);
   }
 
   rotate(rot:mat4){
@@ -81,45 +80,40 @@ class Turtle {
     // for(var i = 0; i < this.instructions.length; i++){
     //   this.fnMap[this.instructions.charAt(i).toString()];
     // }
-    for(var i = 0;i < this.size;i = i + 3){
+    for(var i = 0;i < this.size;i = i + 4){
       //positions
-      var pos = vec4.fromValues(this.basePositions[i], this.basePositions[i+1], this.basePositions[i+2], 1.0);
+      var pos = vec4.fromValues(this.basePositions[i], this.basePositions[i+1], this.basePositions[i+2], this.basePositions[i+3]);
       pos = vec4.transformMat4(pos,pos,m);
       this.basePositions[i] = pos[0];
       console.log(this.basePositions[i]);
       this.basePositions[i+1] = pos[1];
       this.basePositions[i+2] = pos[2];
-      this.positions = this.positions.concat(pos[0], pos[1], pos[2]);
+      this.basePositions[i+3] = pos[3];
+      this.positions = this.positions.concat(pos[0], pos[1], pos[2],pos[3]);
 
       // //normals
-      var nor = vec4.fromValues(this.baseNormals[i], this.baseNormals[i+1], this.baseNormals[i+2], 0.0);
+      var nor = vec4.fromValues(this.baseNormals[i], this.baseNormals[i+1], this.baseNormals[i+2], this.baseNormals[i+3]);
       nor = vec4.transformMat4(nor, nor,m);
       this.baseNormals[i] = nor[0];
       this.baseNormals[i+1] = nor[1];
       this.baseNormals[i+2] = nor[2];
-      this.normals = this.normals.concat(nor[0], nor[1], nor[2]);
-      // this.normals.push(nor[0]);
-      // this.normals.push(nor[1]);
-      // this.normals.push(nor[2]);
+      this.baseNormals[i+3] = nor[3];
+      this.normals = this.normals.concat(nor[0], nor[1], nor[2],nor[3]);
     }
 
-    for(var j = 0;j < this.index;j = j + 3){
-      // //indices
-      console.log('index' + this.baseIndices[j]);
-      this.baseIndices[j] = this.baseIndices[j] + (this.iter * this.index);
-      console.log('index' + this.baseIndices[j]);
-      this.baseIndices[j+1] = this.baseIndices[j+1]  + (this.iter * this.index);
-      this.baseIndices[j+2] = this.baseIndices[j+2] + (this.iter * this.index);
-      this.indices = this.indices.concat(this.baseIndices[j], this.baseIndices[j+1], this.baseIndices[j+2]);
-      // this.indices.push(this.baseIndices[i]);
-      // this.indices.push(this.baseIndices[i+1]);
-      // this.indices.push(this.baseIndices[i+2]);
-
-    }
-    console.log('positions buffer is ' + this.positions.length);
-    console.log('normals buffer is ' + this.normals.length);
+    var offset = Math.floor(this.positions.length / 4.0);
     console.log('indices buffer is ' + this.indices.length);
-    this.iter++;
+    for(var j = 0;j < this.index; j++){
+      // //indices
+      
+      this.baseIndices[j] = this.baseIndices[j] + offset;
+      this.indices.push(this.baseIndices[j]);
+
+    }
+    // console.log('positions buffer is ' + this.positions);
+    // console.log('normals buffer is ' + this.normals);
+    console.log('indices buffer is ' + this.indices);
+    //this.iter++;
 
   }
 
