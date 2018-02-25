@@ -1,7 +1,8 @@
 import * as CameraControls from '3d-view-controls';
-import {vec3, mat4} from 'gl-matrix';
+import {vec3, vec4, mat4} from 'gl-matrix';
 import DrawableRule from './DrawableRule';
 import Turtle from './Turtle';
+import MeshDrawable from './geometry/MeshDrawable'
 
 
 
@@ -89,8 +90,15 @@ rulebook.Add('F', 'FF');
 class LSystem {
   controls: any;
   currentRule: string;
-  constructor(seed: string) {
+  mesh: MeshDrawable;
+  baseIndices: Uint16Array;
+  basePositions: Float32Array;
+  baseNormals: Float32Array;
+  center: vec4;
+  //turtle: Turtle;
+  constructor(seed: string, mesh: MeshDrawable) {
       this.currentRule = seed;
+      this.mesh = mesh;
   }
   
   
@@ -115,8 +123,30 @@ expandRule(seed:string): string {
  }
 
  draw(){
-    var dR = new DrawableRule(this.currentRule);
+    var dR = new DrawableRule(this.currentRule, this.mesh);
+    // this.mesh.appendInd(dR.getInd());
+    // this.mesh.appendPos(dR.getPos());
+    // this.mesh.appendNor(dR.getNor());
     dR.draw();
+    // this.mesh.appendInd(dR.getInd());
+    // this.mesh.appendPos(dR.getPos());
+    // this.mesh.appendNor(dR.getNor());
+
+    //dR.draw();
+    //dR.draw();
+
+    //dR.draw();
+    this.mesh.appendInd(dR.getInd());
+    this.mesh.appendPos(dR.getPos());
+    this.mesh.appendNor(dR.getNor());
+    // this.mesh.appendInd(dR.getInd());
+    // this.mesh.appendPos(dR.getPos());
+    // this.mesh.appendNor(dR.getNor());
+    // dR.draw();
+    // this.mesh.appendInd(dR.getInd());
+    // this.mesh.appendPos(dR.getPos());
+    // this.mesh.appendNor(dR.getNor());
+    this.mesh.createMesh();
  }
  
 

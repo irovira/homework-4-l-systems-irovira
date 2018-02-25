@@ -30,6 +30,7 @@ let square: Square;
 let cube: Cube;
 let meshOBJ: any;
 let mesh: MeshDrawable;
+let lsystem: LSystem;
 //let mesh: OBJ.Mesh;
 
 
@@ -37,7 +38,12 @@ let mesh: MeshDrawable;
 
 function loadScene() {
   mesh = new MeshDrawable(vec3.fromValues(0,0,0));
-  mesh.createMesh('my_cube.obj');
+  mesh.initMesh('my_cube.obj');
+  console.log(mesh.toString());
+  //lsystem = new LSystem('F', mesh);
+  //lsystem.expand(1);
+  //lsystem.draw();
+  mesh.createMesh();
 
   // var test = new LSystem('X');
   // var s = test.expand(2);
