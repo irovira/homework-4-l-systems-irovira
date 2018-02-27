@@ -170,7 +170,7 @@ class Turtle {
 
   scale(s:vec3){
 
-    this.s = vec3.fromValues(this.s[0]* 0.95, this.s[1] * 0.75, this.s[2]* 0.75);
+    this.s = vec3.fromValues(this.s[0]* 0.75, this.s[1] * 0.75, this.s[2]* 0.75);
 
     this.rotTransMat = mat4.fromRotationTranslationScale(this.rotTransMat, this.rot, this.pos, this.s);
 
@@ -179,7 +179,7 @@ class Turtle {
 
   scaleOnly(){
 
-    this.s = vec3.fromValues(this.s[0]* 0.3, this.s[1] * 0.3, this.s[2]* 0.3);
+    this.s = vec3.fromValues(this.s[0]* 0.3, this.s[1] * 0.5, this.s[2]* 0.3);
 
     this.rotTransMat = mat4.fromRotationTranslationScale(this.rotTransMat, this.rot, this.pos, this.s);
   }
@@ -244,10 +244,11 @@ class Turtle {
   }
 
   drawFlower(){
+    //tried to get another obj to load :( but failed
     // var weh = vec3.fromValues(this.orientation[0],this.orientation[1],this.orientation[2]);
     // vec3.scale(weh,weh,3.0);
-    // // var translation = vec3.create();
-    // // vec3.multiply(translation, dir, weh);
+    // // // var translation = vec3.create();
+    // // // vec3.multiply(translation, dir, weh);
     // var tempPos = vec3.create();
     // var currPos = vec3.create();
     // vec3.copy(currPos, this.pos);
@@ -256,7 +257,7 @@ class Turtle {
     // var tempRot = quat.create();
     // quat.copy(tempRot, this.rot);
 
-    // var tempScale = vec3.fromValues(4,4,4);
+    // var tempScale = vec3.fromValues(1,1,1);
 
     // var tempMat = mat4.create();
     // mat4.fromRotationTranslationScale(tempMat, tempRot,tempPos,tempScale);
@@ -281,6 +282,7 @@ class Turtle {
     // }
 
     // var offset = Math.floor(this.positions.length / 4.0);
+    // var f = Math.floor(this.flowerPositions.length)
     // for(var j = 0;j < this.flowerInd; j++){
     //   // //indices
       

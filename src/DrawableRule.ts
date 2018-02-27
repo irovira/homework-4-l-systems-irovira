@@ -125,7 +125,9 @@ class DrawableRule {
   }
 
   drawFlower(){
-    //this.turtle.drawFlower();
+    // console.log('drawflower called');
+    // this.turtle.moveOnly();
+    // this.turtle.drawFlower();
     this.turtle.moveOnly();
     this.turtle.scaleOnly();
     
