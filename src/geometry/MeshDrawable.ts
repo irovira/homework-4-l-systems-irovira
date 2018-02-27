@@ -147,7 +147,33 @@ class MeshDrawable extends Drawable {
     this.currNormals = this.currNormals.concat(nor);
   }
 
+  scaleMesh(num:number){
+    //ONLY USE FOR FLOWER
+    var s = vec3.fromValues(num,num,num);
+    var mat = mat4.create()
+    mat = mat4.fromScaling(mat,s);
 
+    for(var i = 0;i < this.currPositions.length;i = i + 4){
+      //positions
+      var pos = vec4.fromValues(this.currPositions[i], this.currPositions[i+1], this.currPositions[i+2], this.currPositions[i+3]);
+      pos = vec4.transformMat4(pos,pos,mat);
+      this.currPositions[i] = pos[0];
+      this.currPositions[i+1] = pos[1];
+      this.currPositions[i+2] = pos[2];
+      this.currPositions[i+3] = pos[3];
+
+      //this.positions = this.currPositions.concat(pos[0], pos[1], pos[2],pos[3]);
+
+      // //normals
+      var nor = vec4.fromValues(this.currNormals[i], this.currNormals[i+1], this.currNormals[i+2], this.currNormals[i+3]);
+      nor = vec4.transformMat4(nor,nor,mat);
+      this.currNormals[i] = nor[0];
+      this.currNormals[i+1] = nor[1];
+      this.currNormals[i+2] = nor[2];
+      this.currNormals[i+3] = nor[3];
+    }
+
+  }
 
   create(){}
 };

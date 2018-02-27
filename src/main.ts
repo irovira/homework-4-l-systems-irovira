@@ -19,10 +19,13 @@ var OBJ = require('webgl-obj-loader');
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+  axiom: 'FF[f]A',
   tesselations: 5,
+  spread: 60,
+  iter: 1,
   'Load Scene': loadScene, // A function pointer, essentially
   //'test' : test, 
-  color: [255.0,0.0,0.0,1.0],
+  color: [255.0,255.0,255.0,1.0],
 }; 
 
 let icosphere: Icosphere;
@@ -30,6 +33,7 @@ let square: Square;
 let cube: Cube;
 let meshOBJ: any;
 let mesh: MeshDrawable;
+let flower:MeshDrawable;
 let lsystem: LSystem;
 //let mesh: OBJ.Mesh;
 
@@ -38,11 +42,21 @@ let lsystem: LSystem;
 
 function loadScene() {
   mesh = new MeshDrawable(vec3.fromValues(0,0,0));
-  mesh.initMesh('my_cube.obj');
-  console.log(mesh.toString());
-  lsystem = new LSystem('FX', mesh);
-  lsystem.expand(3);
+  mesh.initMesh('branch.obj');
+
+  flower = new MeshDrawable(vec3.fromValues(0.75,-1,0));
+  flower.initMesh('flower.obj'); 
+  flower.scaleMesh(10);
+  flower.createMesh();
+
+
+  lsystem = new LSystem(controls.axiom, mesh, flower, controls.spread);
+  lsystem.spread = controls.spread;
+  lsystem.expand(controls.iter);
   lsystem.draw();
+  
+  //square = new Square(vec3.fromValues(0,-0.5,0));
+  //square.create();
   // mesh.createMesh();
 
   // var test = new LSystem('X');
@@ -62,7 +76,10 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
+  gui.add(controls, 'spread', 60, 90).step(1);
+  gui.add(controls, 'iter', 0, 3).step(1);
   gui.add(controls, 'Load Scene');
+  gui.add(controls, 'axiom');
   //gui.add(controls, 'test');
   gui.addColor(controls, 'color');
 
@@ -103,6 +120,8 @@ function main() {
     lambert.setGeometryColor(currColor);
     renderer.render(camera, lambert, [
       mesh,
+      flower,
+      //square
       //cube,
     ]);
 

@@ -7,7 +7,7 @@ import MeshDrawable from './geometry/MeshDrawable';
 //Fractal Plant rules referenced from: https://en.wikipedia.org/wiki/L-system
 //(X → F[−X][X]F[−X]+FX), (F → FF)
 //var fnMap = newLocal
-const degree = Math.PI / 180;
+const degree = Math.PI / 180.0;
 class DrawableRule {
   controls: any;
   instructions: string;
@@ -16,9 +16,16 @@ class DrawableRule {
   basePositions: Float32Array;
   baseNormals: Float32Array;
   turtle: Turtle;
-  mesh:MeshDrawable
-  constructor(instructions: string, mesh:MeshDrawable) {
+  mesh:MeshDrawable;
+  spread:number;
+
+  flowerIndices: Uint32Array;
+  flowerPositions: Float32Array;
+  flowerNormals: Float32Array;
+  
+  constructor(instructions: string, mesh:MeshDrawable, flower:MeshDrawable) {
     this.fnMap = {};
+    this.spread = 60.0;
     this.instructions = instructions;
     //this.fnMap["X"] = this.X();
     this.fnMap["F"] = this.F;
@@ -31,9 +38,13 @@ class DrawableRule {
     this.basePositions = new Float32Array(mesh.currPositions);
     this.baseNormals = new Float32Array(mesh.currNormals);
     this.baseIndices = new Uint32Array(mesh.currIndices);
+
     //console.log(this.baseIndices.toString());
     this.turtle = new Turtle(mesh.currPositions, mesh.currNormals, mesh.currIndices);
+    this.turtle.initFlower(flower.currPositions, flower.currNormals, flower.currIndices);
   }
+
+
 
   X(){
     var r = 2;
@@ -62,21 +73,68 @@ class DrawableRule {
   rotateLeft(){
     //console.log('rotate left called');
     var rot = quat.create();
-    quat.rotateZ(rot,rot,45);
+    quat.rotateZ(rot,rot,45*degree);
     this.turtle.rotate(rot);
     this.mesh.appendInd(this.getInd());
-      this.mesh.appendPos(this.getPos());
-      this.mesh.appendNor(this.getNor());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
     //this.turtle.rotate(rot);
   }
   rotateRight(){
     //console.log('rotate right called');
     var rot = quat.create();
-    quat.rotateZ(rot,rot,-45);
+    quat.rotateZ(rot,rot,-45*degree);
     this.turtle.rotate(rot);
     this.mesh.appendInd(this.getInd());
-      this.mesh.appendPos(this.getPos());
-      this.mesh.appendNor(this.getNor());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
+  }
+
+  pitch(){
+    //console.log('rotate left called');
+    var rot = quat.create();
+    quat.rotateY(rot,rot,-15*degree);
+    this.turtle.rotate(rot);
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
+    //this.turtle.rotate(rot);
+  }
+
+  roll(){
+    //console.log('rotate left called');
+    var rot = quat.create();
+    //console.log(this.spread.toString());
+    quat.rotateX(rot,rot,this.spread*degree);
+    quat.rotateY(rot,rot,180*degree);
+    quat.rotateZ(rot,rot,this.spread*degree);
+    
+    
+    this.turtle.rotate(rot);
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
+    //this.turtle.rotate(rot);
+  } 
+
+  scale(){
+    this.turtle.scale(vec3.fromValues(0,3,0));
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
+  }
+
+  drawFlower(){
+    //this.turtle.drawFlower();
+    this.turtle.moveOnly();
+    this.turtle.scaleOnly();
+    
+    for(var i = 0; i < 3; i++){
+      this.roll();
+    }
+    // this.mesh.appendInd(this.getInd());
+    // this.mesh.appendPos(this.getPos());
+    // this.mesh.appendNor(this.getNor());
   }
 
   getPos() : Array<number>{
@@ -91,11 +149,15 @@ class DrawableRule {
     return this.turtle.indices;
   }
 
-  
+  // A= " [&FFFA] //// [&FFFA] //// [&FFFA].
+//" scale branch length
+//& Pitch up : (z axis)
+// / : roll counterclockwise (y axis)
 
   draw(){
     //this.X();
-    console.log(this.instructions);
+    // this.drawFlower();
+    // console.log(this.instructions);
     for(var i = 0; i < this.instructions.length; i++){
       var rule = this.instructions.charAt(i).toString();
       if( rule == 'F'){
@@ -106,13 +168,20 @@ class DrawableRule {
         this.rotateRight();
       } else if (rule == '-'){
         this.rotateLeft();
+      } else if (rule == '&'){
+        this.pitch();
+      } else if (rule == '/'){
+        this.roll();
       } else if (rule == '['){
         this.push();
       } else if (rule == ']'){
         this.pop();
+      } else if (rule == '"'){
+        this.scale();
+      } else if (rule == 'f'){
+        this.drawFlower();
       }
       
-
     }
     // this.F();
     // this.mesh.appendInd(this.getInd());

@@ -2,7 +2,7 @@ import * as CameraControls from '3d-view-controls';
 import {vec3, vec4, mat4} from 'gl-matrix';
 import DrawableRule from './DrawableRule';
 import Turtle from './Turtle';
-import MeshDrawable from './geometry/MeshDrawable'
+import MeshDrawable from './geometry/MeshDrawable';
 
 
 
@@ -86,21 +86,31 @@ var rulebook = new Dictionary();
 // rulebook.Add('X','F[−X][X]F[−X]+FX');
 // rulebook.Add('X','F[+X]F[-X]+X');
 
+// A= " [&FFFA] //// [&FFFA] //// [&FFFA].
+//" scale branch length
+//& Pitch up : (z axis)
+// / : roll counterclockwise (y axis)
+
 // rulebook.Add('F', 'FF');
 //rules  : (1 → 11), (0 → 1[0]0)
-rulebook.Add('F', 'F');
-rulebook.Add('X', 'F[-X]+X');
+// rulebook.Add('F', 'F');
+// rulebook.Add('X', 'F[-X]+X');
+rulebook.Add('A', '"[&FF[f]F[f]A]////[&FF[f]F[f]A]////[&FF[f]F[f]A]');
 
 
 class LSystem {
   controls: any;
   currentRule: string;
   mesh: MeshDrawable;
+  flower:MeshDrawable;
   center: vec4;
+  spread:number;
   //turtle: Turtle;
-  constructor(seed: string, mesh: MeshDrawable) {
+  constructor(seed: string, mesh: MeshDrawable, flower:MeshDrawable, spread:number) {
       this.currentRule = seed;
       this.mesh = mesh;
+      this.flower = flower;
+      this.spread = spread;
   }
   
   
@@ -130,7 +140,9 @@ expandRule(seed:string): string {
  }
 
  draw(){
-    var dR = new DrawableRule(this.currentRule, this.mesh);
+    var dR = new DrawableRule(this.currentRule, this.mesh, this.flower);
+
+    dR.spread = this.spread;
     this.mesh.appendInd(dR.getInd());
     this.mesh.appendPos(dR.getPos());
     this.mesh.appendNor(dR.getNor());
