@@ -34,6 +34,18 @@ class Turtle {
   iter: number;
   size:number;
   index:number;
+  
+
+  pos:vec3;
+  orientation:vec4;
+  rot:quat;
+  rotTransMat:mat4;
+
+  posStack:Array<vec3>;
+  rotStack:Array<quat>;
+  orientationStack:Array<vec4>;
+  matStack:Array<mat4>;
+
 
   turtleStack: Stack;
   
@@ -42,7 +54,6 @@ class Turtle {
     this.baseNormals = normals;
     this.baseIndices = indices;
     this.turtleStack = new Stack();
-    console.log('inside turtle indices are ' + indices.length);
 
     this.positions = new Array<number>();
     this.normals = new Array<number>();
@@ -50,136 +61,114 @@ class Turtle {
     this.iter = 1;
     this.size = this.basePositions.length;
     this.index = this.baseIndices.length;
-    console.log('size is ' + this.index);
+
+    this.pos = vec3.create();
+    this.orientation = vec4.fromValues(0,1,0,0);
+    this.rot = quat.create();
+    this.rotTransMat = mat4.create();
     
+    //this.rotTransMat = mat4.fromRotationTranslation(this.rotTransMat, this.rot,this.pos);
+
+    this.posStack = new Array<vec3>();
+    this.rotStack = new Array<quat>();
+    this.orientationStack = new Array<vec4>();
+    this.matStack = new Array<mat4>();
     
-    
-    //append base to positions array
-    // var position =  Array.prototype.slice.call(this.basePositions);
-    // this.positions = this.positions.concat(position);
-    //norms
-    // var nor =  Array.prototype.slice.call(this.baseNormals);
-    // this.normals = this.normals.concat(nor);
-    //indices
-    // var ind =  Array.prototype.slice.call(this.baseIndices);
-    // this.indices =  this.indices.concat(ind);
 
   }
 
   rotate(rot:quat){
     //mat4.multiply(this.rotation, this.rotation,rot);
-    var translation = vec3.create();
-    vec3.set (translation, 0,1, 0);
-    console.log(translation);
+    this.rot = quat.multiply(this.rot, this.rot, rot);
     var m = mat4.create();
-    mat4.fromRotationTranslation(m, rot, translation) 
-    //mat4.translate (m, m, translation);
-    //mat4.multiply(m, m,rot);
-    console.log(m);
-    //var m = mat4.fromTranslation(m, vec3.fromValues(0,1,0));
-    // for(var i = 0; i < this.instructions.length; i++){
-    //   this.fnMap[this.instructions.charAt(i).toString()];
-    // }
-    for(var i = 0;i < this.size;i = i + 4){
-      //positions
-      var pos = vec4.fromValues(this.basePositions[i], this.basePositions[i+1], this.basePositions[i+2], this.basePositions[i+3]);
-      pos = vec4.transformMat4(pos,pos,m);
-      this.basePositions[i] = pos[0];
-      console.log(this.basePositions[i]);
-      this.basePositions[i+1] = pos[1];
-      this.basePositions[i+2] = pos[2];
-      this.basePositions[i+3] = pos[3];
-      this.positions = this.positions.concat(pos[0], pos[1], pos[2],pos[3]);
-
-      // //normals
-      var nor = vec4.fromValues(this.baseNormals[i], this.baseNormals[i+1], this.baseNormals[i+2], this.baseNormals[i+3]);
-      nor = vec4.transformMat4(nor, nor,m);
-      this.baseNormals[i] = nor[0];
-      this.baseNormals[i+1] = nor[1];
-      this.baseNormals[i+2] = nor[2];
-      this.baseNormals[i+3] = nor[3];
-      this.normals = this.normals.concat(nor[0], nor[1], nor[2],nor[3]);
-    }
-
-    var offset = Math.floor(this.positions.length / 4.0);
-    console.log('indices buffer is ' + this.indices.length);
-    for(var j = 0;j < this.index; j++){
-      // //indices
-      
-      this.baseIndices[j] = this.baseIndices[j] + offset;
-      this.indices.push(this.baseIndices[j]);
-
-    }
-    // console.log('positions buffer is ' + this.positions);
-    // console.log('normals buffer is ' + this.normals);
-    console.log('indices buffer is ' + this.indices);
+    mat4.fromQuat(m,this.rot);
+    this.orientation = vec4.transformMat4(this.orientation,this.orientation,m);
+    this.rotTransMat = mat4.fromRotationTranslation(this.rotTransMat, this.rot,this.pos);
+    //var m = mat4.create();
+    //mat4.fromQuat(m,rot);
+    //fromRotationTranslation(m, rot, translation) 
+    //this.rotTransMat = mat4.multiply(this.rotTransMat, this.rotTransMat,m);
+    this.draw();
   }
 
   move(dir:vec3){
-    var translation = vec3.create();
-    vec3.set (translation, dir[0],dir[1], dir[2]);
-    console.log(translation);
-    var m = mat4.create();
-    mat4.translate (m, m, translation);
-    console.log(m);
-    //var m = mat4.fromTranslation(m, vec3.fromValues(0,1,0));
-    // for(var i = 0; i < this.instructions.length; i++){
-    //   this.fnMap[this.instructions.charAt(i).toString()];
-    // }
+    var weh = vec3.fromValues(this.orientation[0],this.orientation[1],this.orientation[2]);
+    vec3.scale(weh,weh,3);
+    // var translation = vec3.create();
+    // vec3.multiply(translation, dir, weh);
+    
+    this.pos = vec3.add(this.pos, this.pos, weh);
+
+    this.rotTransMat = mat4.fromRotationTranslation(this.rotTransMat, this.rot,this.pos);
+
+    // var m = mat4.create();
+    // mat4.translate (m, m, translation);
+    
+    // this.rotTransMat = mat4.multiply(this.rotTransMat, this.rotTransMat,m);
+
+    this.draw();
+  }
+
+  push(){
+
+    //var t = new Turtle(this.basePositions, this.baseNormals, this.baseIndices);
+    var pRot = quat.create();
+    quat.copy(pRot,this.rot);
+    this.rotStack.push(pRot);
+
+    var pPos = vec3.create();
+    vec3.copy(pPos,this.pos);
+    this.posStack.push(pPos);
+
+    var pOr = vec4.create();
+    pOr = vec4.copy(pOr, this.orientation);
+    this.orientationStack.push(pOr);
+
+    var mat = mat4.create();
+    mat4.copy(mat, this.rotTransMat);
+    this.matStack.push(mat);
+
+  }
+
+  pop(){
+
+    this.rot = quat.copy(this.rot,this.rotStack.pop());
+    this.pos = vec3.copy(this.pos,this.posStack.pop());
+    this.orientation = vec4.copy(this.orientation, this.orientationStack.pop());
+    this.rotTransMat = mat4.copy(this.rotTransMat,this.matStack.pop());
+  }
+
+  draw(){
     for(var i = 0;i < this.size;i = i + 4){
       //positions
       var pos = vec4.fromValues(this.basePositions[i], this.basePositions[i+1], this.basePositions[i+2], this.basePositions[i+3]);
-      pos = vec4.transformMat4(pos,pos,m);
-      this.basePositions[i] = pos[0];
-      console.log(this.basePositions[i]);
-      this.basePositions[i+1] = pos[1];
-      this.basePositions[i+2] = pos[2];
-      this.basePositions[i+3] = pos[3];
+      pos = vec4.transformMat4(pos,pos,this.rotTransMat);
+
+      // this.basePositions[i] = pos[0];
+      // this.basePositions[i+1] = pos[1];
+      // this.basePositions[i+2] = pos[2];
+      // this.basePositions[i+3] = pos[3];
+
       this.positions = this.positions.concat(pos[0], pos[1], pos[2],pos[3]);
 
       // //normals
       var nor = vec4.fromValues(this.baseNormals[i], this.baseNormals[i+1], this.baseNormals[i+2], this.baseNormals[i+3]);
-      nor = vec4.transformMat4(nor, nor,m);
-      this.baseNormals[i] = nor[0];
-      this.baseNormals[i+1] = nor[1];
-      this.baseNormals[i+2] = nor[2];
-      this.baseNormals[i+3] = nor[3];
+      nor = vec4.transformMat4(nor, nor,this.rotTransMat);
+      // this.baseNormals[i] = nor[0];
+      // this.baseNormals[i+1] = nor[1];
+      // this.baseNormals[i+2] = nor[2];
+      // this.baseNormals[i+3] = nor[3];
+
       this.normals = this.normals.concat(nor[0], nor[1], nor[2],nor[3]);
     }
 
     var offset = Math.floor(this.positions.length / 4.0);
-    console.log('indices buffer is ' + this.indices.length);
     for(var j = 0;j < this.index; j++){
       // //indices
       
       this.baseIndices[j] = this.baseIndices[j] + offset;
       this.indices.push(this.baseIndices[j]);
-
     }
-    // console.log('positions buffer is ' + this.positions);
-    // console.log('normals buffer is ' + this.normals);
-    console.log('indices buffer is ' + this.indices);
-    //this.iter++;
-
-  }
-
-  push(){
-    this.turtleStack.push(new Turtle(this.basePositions, this.baseNormals, this.baseIndices));
-  }
-
-  pop(){
-    var p = this.turtleStack.pop();
-    //this.baseIndices = p.baseIndices;
-    this.basePositions = p.basePositions;
-    //this.baseNormals = p.baseNormals;
-    // this.positions = p.positions;
-    // this.normals = p.normals;
-  }
-
-  draw(){
-    // for(var i = 0; i < this.instructions.length; i++){
-    //   this.fnMap[this.instructions.charAt(i).toString()];
-    // }
   }
 
   update() {

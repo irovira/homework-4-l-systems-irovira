@@ -40,8 +40,8 @@ function loadScene() {
   mesh = new MeshDrawable(vec3.fromValues(0,0,0));
   mesh.initMesh('my_cube.obj');
   console.log(mesh.toString());
-  lsystem = new LSystem('X', mesh);
-  lsystem.expand(2);
+  lsystem = new LSystem('FX', mesh);
+  lsystem.expand(3);
   lsystem.draw();
   // mesh.createMesh();
 

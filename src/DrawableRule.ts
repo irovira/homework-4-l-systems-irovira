@@ -37,32 +37,46 @@ class DrawableRule {
 
   X(){
     var r = 2;
-    this.turtle.move(vec3.fromValues(1.5,0,0));
+    //this.turtle.draw();
+    //this.turtle.move(vec3.fromValues(1.5,0,0));
     
   }
   F(){
-    console.log('f is called lol');
-    this.turtle.move(vec3.fromValues(0,2,0));
+    //console.log('f is called lol');
+    this.turtle.move(vec3.fromValues(0,3,0));
+    this.mesh.appendInd(this.getInd());
+    this.mesh.appendPos(this.getPos());
+    this.mesh.appendNor(this.getNor());
     
   }
   push(){
+    //console.log('push called');
     this.turtle.push();
+
   }
   pop(){
+    //console.log('pop called');
     this.turtle.pop();
+    
   }
   rotateLeft(){
-    console.log('rotate left called');
+    //console.log('rotate left called');
     var rot = quat.create();
-    quat.rotateZ(rot,rot,25*degree);
+    quat.rotateZ(rot,rot,45);
     this.turtle.rotate(rot);
+    this.mesh.appendInd(this.getInd());
+      this.mesh.appendPos(this.getPos());
+      this.mesh.appendNor(this.getNor());
     //this.turtle.rotate(rot);
   }
   rotateRight(){
-    console.log('rotate right called');
+    //console.log('rotate right called');
     var rot = quat.create();
-    quat.rotateZ(rot,rot,-25*degree);
+    quat.rotateZ(rot,rot,-45);
     this.turtle.rotate(rot);
+    this.mesh.appendInd(this.getInd());
+      this.mesh.appendPos(this.getPos());
+      this.mesh.appendNor(this.getNor());
   }
 
   getPos() : Array<number>{
@@ -97,9 +111,7 @@ class DrawableRule {
       } else if (rule == ']'){
         this.pop();
       }
-      this.mesh.appendInd(this.getInd());
-      this.mesh.appendPos(this.getPos());
-      this.mesh.appendNor(this.getNor());
+      
 
     }
     // this.F();

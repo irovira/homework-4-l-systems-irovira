@@ -82,9 +82,14 @@ export class Dictionary {
 //Fractal Plant rules referenced from: https://en.wikipedia.org/wiki/L-system
 //(X → F[−X][X]F[−X]+FX), (F → FF)
 var rulebook = new Dictionary();
-rulebook.Add('X','F[−X][X]F[−X]+FX');
-rulebook.Add('F', 'FF');
+//F[+X]F[-X]+X
+// rulebook.Add('X','F[−X][X]F[−X]+FX');
+// rulebook.Add('X','F[+X]F[-X]+X');
 
+// rulebook.Add('F', 'FF');
+//rules  : (1 → 11), (0 → 1[0]0)
+rulebook.Add('F', 'F');
+rulebook.Add('X', 'F[-X]+X');
 
 
 class LSystem {
@@ -102,12 +107,14 @@ class LSystem {
 
 expandRule(seed:string): string {
     var curr  = "";
-    console.log('seed is ' + seed);
+    //console.log('seed is ' + seed);
     for (var i = 0; i < seed.length; i++) {
         console.log(rulebook.ContainsKey(seed.charAt(i).toString()));
         if(rulebook.ContainsKey(seed.charAt(i).toString())){
-            console.log("Contains Key + " + seed.charAt(i).toString());
+            //console.log("Contains Key + " + seed.charAt(i).toString());
             curr = curr + rulebook.Item(seed.charAt(i).toString());
+        } else {
+            curr = curr + seed.charAt(i).toString();
         }
     }
     
@@ -115,7 +122,7 @@ expandRule(seed:string): string {
 }
 
  expand(iter: number): string{
-     console.log('expand called');
+     //console.log('expand called');
     for(var i = 0; i < iter; i++){
         this.currentRule = this.expandRule(this.currentRule);
     }

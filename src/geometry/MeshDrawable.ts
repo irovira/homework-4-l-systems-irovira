@@ -134,20 +134,17 @@ class MeshDrawable extends Drawable {
 
   appendPos(pos:Array<number>){
     this.currPositions = this.currPositions.concat(pos);
-    console.log('the currentpositions buffer size is ' + this.currPositions.length);
+
   }
 
   appendInd(ind:Array<number>){
-    console.log('the currentindex buffer size is ' + this.currIndices.length);
-    console.log('the incoming array is ' + ind.length);
+
     this.currIndices = this.currIndices.concat(ind);
-    console.log('the currentindex buffer size is ' + this.currIndices.length);
+
   }
 
   appendNor(nor:Array<number>){
     this.currNormals = this.currNormals.concat(nor);
-    
-    console.log('the currentnormal buffer size is ' + this.currNormals.length);
   }
 
 
